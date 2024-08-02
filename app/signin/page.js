@@ -51,7 +51,7 @@ export default function SignIn() {
         width="100%" // Ensure full width
         overflow="hidden" // Prevent overflow issues
       >
-        <Image src="/illustration.svg" alt="Sign In Illustration" width={200} height={200} />
+        <Image src="/illustration.svg" alt="Sign In Illustration" width={300} height={300} />
         
         <Typography variant="h4" color="text.primary" gutterBottom mt={4} mb={2}>
           Pantry Tracker

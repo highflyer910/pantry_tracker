@@ -1,6 +1,9 @@
 'use client'
 import { useState, useEffect } from "react";
-import { firestore } from "@/firebase";
+import { useAuth } from '../authcontext';
+import { useRouter } from 'next/navigation';
+import { firestore, auth, googleProvider } from "@/firebase";
+import { signInWithPopup, signOut } from 'firebase/auth';
 import { 
   Box, Stack, Modal, Typography, TextField, Button, 
   Paper, Fade, Grow, IconButton, ThemeProvider, createTheme
@@ -8,11 +11,10 @@ import {
 import { collection, getDocs, query, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import Image from 'next/image';
 
-// Create a custom theme with pastel colors and increased contrast
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#6b9bd1', // Darker blue for better contrast
+      main: '#6b9bd1',
     },
     secondary: {
       main: '#f1faee',
@@ -22,12 +24,14 @@ const theme = createTheme({
       paper: '#ffd3b6',
     },
     text: {
-      primary: '#1d3557', // Darker text for better readability
+      primary: '#1d3557',
     },
   },
 });
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [pantryProducts, setPantryProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [productName, setProductName] = useState('');
@@ -87,8 +91,12 @@ export default function Home() {
   };
 
   useEffect(() => {
-    updatePantryProducts();
-  }, []);
+    if (!loading && !user) {
+      router.push('/signin');
+    } else if (user) {
+      updatePantryProducts();
+    }
+  }, [user, loading, router]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -97,29 +105,68 @@ export default function Home() {
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.push('/signin');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (!user) return null;
+
   return (
     <ThemeProvider theme={theme}>
       <Box 
-        width="100vw" 
-         
         display="flex"
-        justifyContent="center"
-        alignItems="center"
         flexDirection="column"
-        gap={4}
+        alignItems="center"
+        justifyContent="center"
+        minHeight="100vh"
         bgcolor="background.default"
         overflow="auto"
         pt={4}
         suppressHydrationWarning
+        position="relative"
+        width="100%" 
       >
-        <Box mb={2}>
-          <Image src="/illustration.svg" alt="Pantry Illustration" width={200} height={200} />
-        </Box>
-        
-        <Typography variant="h2" color="text.primary" fontWeight="bold">
+        <Button variant="outlined" onClick={handleSignOut}
+          sx={{ 
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            borderColor: 'primary.main',
+            color: 'primary.main',
+            '&:hover': {
+              borderColor: 'primary.dark',
+              backgroundColor: 'primary.light',
+              color: 'white',
+            },
+          }}
+        >
+      Sign Out
+      </Button>
+
+
+        <Typography variant="h2" color="text.primary" 
+            fontWeight="bold" 
+            mb={4} 
+            mt={4}
+            sx={{fontSize: '4rem',
+              '@media (max-width: 900px)': {
+                fontSize: '4rem',
+              },
+              '@media (max-width: 600px)': {
+                fontSize: '3rem',
+              },
+            }}
+        >
           Pantry Tracker
         </Typography>
-        
+
+
         <Fade in={true} timeout={1000}>
           <Button 
             variant="contained" 
@@ -249,6 +296,7 @@ export default function Home() {
             ))}
           </Stack>
         </Paper>
+
       </Box>
     </ThemeProvider>
   );

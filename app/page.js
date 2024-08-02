@@ -48,8 +48,8 @@ export default function SignIn() {
         bgcolor="background.default"
         textAlign="center"
         p={2}
-        width="100%" // Ensure full width
-        overflow="hidden" // Prevent overflow issues
+        width="100%" 
+        overflow="hidden"
       >
         <Image src="/illustration.svg" alt="Sign In Illustration" width={300} height={300} />
         

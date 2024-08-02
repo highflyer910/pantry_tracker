@@ -92,7 +92,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/signin');
+      router.push('/');
     } else if (user) {
       updatePantryProducts();
     }
@@ -108,7 +108,7 @@ export default function Home() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      router.push('/signin');
+      router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }

@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from '../authcontext';
 import { useRouter } from 'next/navigation';
-import { firestore, auth, googleProvider } from "@/firebase";
-import { signInWithPopup, signOut } from 'firebase/auth';
+import { firestore, auth } from "@/firebase";
+import { signOut } from 'firebase/auth';
 import { 
   Box, Stack, Modal, Typography, TextField, Button, 
   Paper, Fade, Grow, IconButton, ThemeProvider, createTheme
@@ -38,7 +38,10 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const updatePantryProducts = async () => {
-    const snapshot = query(collection(firestore, 'inventory'));
+    if (!user) return;
+
+    const userInventoryRef = collection(firestore, `users/${user.uid}/inventory`);
+    const snapshot = query(userInventoryRef);
     const docs = await getDocs(snapshot);
     const productList = [];
     docs.forEach((doc) => {
@@ -54,7 +57,9 @@ export default function Home() {
   };
 
   const addProduct = async (productName) => {
-    const docRef = doc(collection(firestore, 'inventory'), productName);
+    if (!user) return;
+
+    const docRef = doc(collection(firestore, `users/${user.uid}/inventory`), productName);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -67,12 +72,14 @@ export default function Home() {
   };
 
   const removeProduct = async (productName) => {
+    if (!user) return;
+
     if (productName === 'boxes') {
       console.log("Cannot delete 'boxes' product");
       return;
     }
 
-    const docRef = doc(collection(firestore, 'inventory'), productName);
+    const docRef = doc(collection(firestore, `users/${user.uid}/inventory`), productName);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -132,7 +139,9 @@ export default function Home() {
         position="relative"
         width="100%" 
       >
-        <Button variant="outlined" onClick={handleSignOut}
+        <Button 
+          variant="outlined" 
+          onClick={handleSignOut}
           sx={{ 
             position: 'absolute',
             top: 16,
@@ -146,26 +155,27 @@ export default function Home() {
             },
           }}
         >
-      Sign Out
-      </Button>
+          Sign Out
+        </Button>
 
-
-        <Typography variant="h2" color="text.primary" 
-            fontWeight="bold" 
-            mb={4} 
-            mt={4}
-            sx={{fontSize: '4rem',
-              '@media (max-width: 900px)': {
-                fontSize: '4rem',
-              },
-              '@media (max-width: 600px)': {
-                fontSize: '3rem',
-              },
-            }}
+        <Typography 
+          variant="h2" 
+          color="text.primary" 
+          fontWeight="bold" 
+          mb={4} 
+          mt={4}
+          sx={{
+            fontSize: '4rem',
+            '@media (max-width: 900px)': {
+              fontSize: '3.5rem',
+            },
+            '@media (max-width: 600px)': {
+              fontSize: '3rem',
+            },
+          }}
         >
           Pantry Tracker
         </Typography>
-
 
         <Fade in={true} timeout={1000}>
           <Button 
@@ -232,26 +242,26 @@ export default function Home() {
           </Fade>
         </Modal>
 
-        <Paper elevation={3} 
-              sx={{ width: '80%', 
-                    maxWidth: 800, 
-                    borderRadius: 2, 
-                    overflow: 'auto', 
-                    mb: 10,  
-                    '& ::-webkit-scrollbar': {
-                      width: '12px',
-                    },
-                    '& ::-webkit-scrollbar-track': {
-                      background: '#f1faee',
-                    },
-                    '& ::-webkit-scrollbar-thumb': {
-                      background: '#6b9bd1',
-                      }, 
-                  }}>
-          <Box 
-            p={2} 
-            bgcolor="primary.main"
-          >
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            width: '80%', 
+            maxWidth: 800, 
+            borderRadius: 2, 
+            overflow: 'auto', 
+            mb: 10,  
+            '& ::-webkit-scrollbar': {
+              width: '12px',
+            },
+            '& ::-webkit-scrollbar-track': {
+              background: '#f1faee',
+            },
+            '& ::-webkit-scrollbar-thumb': {
+              background: '#6b9bd1',
+            }, 
+          }}
+        >
+          <Box p={2} bgcolor="primary.main">
             <Typography variant="h4" color="white" fontWeight="bold">Pantry Contents</Typography>
           </Box>
 

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../authcontext';
 import { useRouter } from 'next/navigation';
@@ -68,7 +68,7 @@ export default function Home() {
   };
 
   const addProduct = async () => {
-    if (!user) return;
+    if (!user || !productName || productQuantity <= 0) return; // Added validation
 
     const docRef = doc(collection(firestore, `users/${user.uid}/inventory`), productName);
     const docSnap = await getDoc(docRef);
@@ -167,6 +167,9 @@ export default function Home() {
   if (loading) return <div>Loading...</div>;
   if (!user) return null;
 
+  // Check if button should be enabled or disabled
+  const isAddProductButtonDisabled = !productName.trim() || productQuantity <= 0;
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -185,51 +188,51 @@ export default function Home() {
         width="100%"
       >
         <Box
-  sx={{
-    position: 'absolute',
-    top: 16,
-    left: 16, // Changed from right to left
-    display: 'flex',
-    alignItems: 'center',
-    width: 'calc(100% - 32px)', // Adjust width to accommodate spacing
-    justifyContent: 'space-between', // Space between left and right items
-  }}
->
-  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-    {userPhotoURL && (
-      <Image
-        src={userPhotoURL}
-        alt={userName}
-        width={40}
-        height={40}
-        style={{ borderRadius: '50%', marginRight: '10px' }}
-      />
-    )}
-    <Typography
-      variant="body1"
-      color="text.primary"
-      sx={{ mr: 2 }}
-    >
-      {userName}
-    </Typography>
-  </Box>
-  
-  <Button
-    variant="outlined"
-    onClick={handleSignOut}
-    sx={{
-      borderColor: 'primary.main',
-      color: 'primary.main',
-      '&:hover': {
-        borderColor: 'primary.dark',
-        backgroundColor: 'primary.light',
-        color: 'secondary.main',
-      },
-    }}
-  >
-    Sign Out
-  </Button>
-</Box>
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16, // Changed from left to right
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: 'calc(100% - 32px)', // Adjust width to accommodate spacing
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {userPhotoURL && (
+              <Image
+                src={userPhotoURL}
+                alt={userName}
+                width={40}
+                height={40}
+                style={{ borderRadius: '50%', marginRight: '10px' }}
+              />
+            )}
+            <Typography
+              variant="body1"
+              color="text.primary"
+              sx={{ mr: 2 }}
+            >
+              {userName}
+            </Typography>
+          </Box>
+          
+          <Button
+            variant="outlined"
+            onClick={handleSignOut}
+            sx={{
+              borderColor: 'primary.main',
+              color: 'primary.main',
+              '&:hover': {
+                borderColor: 'primary.dark',
+                backgroundColor: 'primary.light',
+                color: 'secondary.main',
+              },
+            }}
+          >
+            Sign Out
+          </Button>
+        </Box>
 
         <Typography
           variant="h2"
@@ -251,45 +254,45 @@ export default function Home() {
         </Typography>
 
         <Box 
-  display="flex" 
-  flexDirection={{ xs: 'column', sm: 'row' }}
-  alignItems="center"
-  justifyContent="center" 
-  gap={2} 
-  mb={4}
-  width="100%"
-  maxWidth={800}
->
-  <Fade in={true} timeout={1000}>
-    <Button 
-      variant="contained" 
-      onClick={handleOpen}
-      size="large"
-      sx={{ 
-        color: 'secondary.main',
-        minWidth: { xs: '90%', sm: 'auto' }
-      }}
-    >
-      Add New Product
-    </Button>
-  </Fade>
-  <Fade in={true} timeout={1000}>
-    <Button 
-      variant="contained" 
-      onClick={getRecipeSuggestions}
-      size="large"
-      sx={{ 
-        color: 'secondary.main', 
-        backgroundColor: '#B35B38',
-        '&:hover': { backgroundColor: '#684835' },
-        minWidth: { xs: '90%', sm: 'auto' }
-      }}
-      disabled={loadingRecipe || pantryProducts.length === 0}
-    >
-      {loadingRecipe ? 'Loading...' : 'Get Recipe Suggestions'}
-    </Button>
-  </Fade>
-</Box>
+          display="flex" 
+          flexDirection={{ xs: 'column', sm: 'row' }}
+          alignItems="center"
+          justifyContent="center" 
+          gap={2} 
+          mb={4}
+          width="100%"
+          maxWidth={800}
+        >
+          <Fade in={true} timeout={1000}>
+            <Button 
+              variant="contained" 
+              onClick={handleOpen}
+              size="large"
+              sx={{ 
+                color: 'secondary.main',
+                minWidth: { xs: '90%', sm: 'auto' }
+              }}
+            >
+              Add New Product
+            </Button>
+          </Fade>
+          <Fade in={true} timeout={1000}>
+            <Button 
+              variant="contained" 
+              onClick={getRecipeSuggestions}
+              size="large"
+              sx={{ 
+                color: 'secondary.main', 
+                backgroundColor: '#B35B38',
+                '&:hover': { backgroundColor: '#684835' },
+                minWidth: { xs: '90%', sm: 'auto' }
+              }}
+              disabled={loadingRecipe || pantryProducts.length === 0}
+            >
+              {loadingRecipe ? 'Loading...' : 'Get Recipe Suggestions'}
+            </Button>
+          </Fade>
+        </Box>
 
         <TextField
           variant='outlined'
@@ -316,6 +319,7 @@ export default function Home() {
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 width: 400,
+                maxWidth: '90%',
                 p: 4,
                 borderRadius: 2,
                 bgcolor: 'background.default',
@@ -343,6 +347,7 @@ export default function Home() {
                 fullWidth
                 onClick={addProduct}
                 sx={{ mt: 2 }}
+                disabled={isAddProductButtonDisabled} // Added disabled state
               >
                 Add Product
               </Button>
@@ -351,68 +356,68 @@ export default function Home() {
         </Modal>
 
         <Paper elevation={3}
-        sx={{
-          width: '90%', 
-          maxWidth: 800,
-          borderRadius: 2,
-          overflow: 'auto',
-          mb: 6,
-          '& ::-webkit-scrollbar': {
-            width: '12px',
-          },
-          '& ::-webkit-scrollbar-track': {
-            background: '#F2D09F',
-          },
-          '& ::-webkit-scrollbar-thumb': {
-            background: '#B35B38',
-        },
-        }}
-        >
-  <Box p={2} bgcolor="primary.main">
-    <Typography variant="h4" color="secondary.main" fontWeight="bold">Pantry Contents</Typography>
-  </Box>
-
-  <Stack spacing={2} p={2} sx={{ maxHeight: 300, overflowY: 'auto' }}>
-    {filteredProducts.map(({ name, quantity }) => (
-      <Grow in={true} key={name}>
-        <Paper
-          elevation={2}
           sx={{
-            p: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            bgcolor: 'background.paper',
+            width: '90%', 
+            maxWidth: 800,
+            borderRadius: 2,
+            overflow: 'auto',
+            mb: 6,
+            '& ::-webkit-scrollbar': {
+              width: '12px',
+            },
+            '& ::-webkit-scrollbar-track': {
+              background: '#F2D09F',
+            },
+            '& ::-webkit-scrollbar-thumb': {
+              background: '#B35B38',
+            },
           }}
         >
-          <Typography variant="h6" color="secondary.main">
-            {name.charAt(0).toUpperCase() + name.slice(1)}
-          </Typography>
-          <Box display="flex" alignItems="center">
-            <Typography variant="h6" color="secondary.main" mr={2}>
-              {quantity}
-            </Typography>
-            <IconButton
-              onClick={() => addProduct(name)}
-              color="text.primary"
-              sx={{ width: 30, height: 30, minWidth: 30 }}
-            >
-              +
-            </IconButton>
-            <IconButton
-              onClick={() => removeProduct(name)}
-              disabled={name === 'boxes'}
-              color="text.primary"
-              sx={{ width: 30, height: 30, minWidth: 30 }}
-            >
-              -
-            </IconButton>
+          <Box p={2} bgcolor="primary.main">
+            <Typography variant="h4" color="secondary.main" fontWeight="bold">Pantry Contents</Typography>
           </Box>
+
+          <Stack spacing={2} p={2} sx={{ maxHeight: 300, overflowY: 'auto' }}>
+            {filteredProducts.map(({ name, quantity }) => (
+              <Grow in={true} key={name}>
+                <Paper
+                  elevation={2}
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    bgcolor: 'background.paper',
+                  }}
+                >
+                  <Typography variant="h6" color="secondary.main">
+                    {name.charAt(0).toUpperCase() + name.slice(1)}
+                  </Typography>
+                  <Box display="flex" alignItems="center">
+                    <Typography variant="h6" color="secondary.main" mr={2}>
+                      {quantity}
+                    </Typography>
+                    <IconButton
+                      onClick={() => addProduct(name)}
+                      color="text.primary"
+                      sx={{ width: 30, height: 30, minWidth: 30 }}
+                    >
+                      +
+                    </IconButton>
+                    <IconButton
+                      onClick={() => removeProduct(name)}
+                      disabled={name === 'boxes'}
+                      color="text.primary"
+                      sx={{ width: 30, height: 30, minWidth: 30 }}
+                    >
+                      -
+                    </IconButton>
+                  </Box>
+                </Paper>
+              </Grow>
+            ))}
+          </Stack>
         </Paper>
-      </Grow>
-    ))}
-  </Stack>
-</Paper>
 
         <Modal open={recipeModalOpen} onClose={() => setRecipeModalOpen(false)}>
           <Fade in={recipeModalOpen}>

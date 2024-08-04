@@ -191,11 +191,11 @@ export default function Home() {
           sx={{
             position: 'absolute',
             top: 16,
-            right: 16, // Changed from left to right
+            right: 16,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            width: 'calc(100% - 32px)', // Adjust width to accommodate spacing
+            width: 'calc(100% - 32px)',
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -374,7 +374,7 @@ export default function Home() {
           }}
         >
           <Box p={2} bgcolor="primary.main">
-            <Typography variant="h4" color="secondary.main" fontWeight="bold">Pantry Contents</Typography>
+            <Typography variant="h4" color="secondary.main" fontWeight="bold">Pantry Products</Typography>
           </Box>
 
           <Stack spacing={2} p={2} sx={{ maxHeight: 300, overflowY: 'auto' }}>

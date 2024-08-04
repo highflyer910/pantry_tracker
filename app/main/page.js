@@ -394,13 +394,13 @@ export default function Home() {
                     {name.charAt(0).toUpperCase() + name.slice(1)}
                   </Typography>
                   <Box display="flex" alignItems="center">
-                    <Typography variant="h6" color="secondary.main" mr={2}>
+                    <Typography variant="h6" color="secondary.main">
                       {quantity}
                     </Typography>
                     <IconButton
                       onClick={() => removeProduct(name)}
                       disabled={name === 'boxes'}
-                      color="text.primary"
+                      color="secondary"
                       sx={{ width: 30, height: 30, minWidth: 30 }}
                     >
                       -

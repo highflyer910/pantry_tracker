@@ -68,6 +68,7 @@ export default function Home() {
   };
 
   const addProduct = async () => {
+    console.log("addProduct called");
     if (!user || !productName || productQuantity <= 0) return; // Added validation
 
     const docRef = doc(collection(firestore, `users/${user.uid}/inventory`), productName);
@@ -167,7 +168,6 @@ export default function Home() {
   if (loading) return <div>Loading...</div>;
   if (!user) return null;
 
-  // Check if button should be enabled or disabled
   const isAddProductButtonDisabled = !productName.trim() || productQuantity <= 0;
 
   return (
@@ -397,13 +397,6 @@ export default function Home() {
                     <Typography variant="h6" color="secondary.main" mr={2}>
                       {quantity}
                     </Typography>
-                    <IconButton
-                      onClick={() => addProduct(name)}
-                      color="text.primary"
-                      sx={{ width: 30, height: 30, minWidth: 30 }}
-                    >
-                      +
-                    </IconButton>
                     <IconButton
                       onClick={() => removeProduct(name)}
                       disabled={name === 'boxes'}
